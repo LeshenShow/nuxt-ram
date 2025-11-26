@@ -6,6 +6,7 @@ import { RICK_AND_MORTY_API } from "~/shared/api/api"
 export const useCharactersStore = defineStore("characters", {
   state: () => ({
     characters: [] as Character[],
+    loading: false,
   }),
   actions: {
     async fetchCharacters(page = 1) {
@@ -18,6 +19,8 @@ export const useCharactersStore = defineStore("characters", {
         }))
       } catch (error) {
         console.error("Ошибка при загрузке персонажей", error)
+      } finally {
+        this.loading = false
       }
     },
     toggleFavorite(id: number) {
