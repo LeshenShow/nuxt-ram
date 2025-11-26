@@ -6,16 +6,29 @@
         <UButton color="primary" size="sm">Favorites</UButton>
       </div>
     </UHeader>
-<!-- v-if="store.loading" -->
-    <UMain>
-      <UContainer class="py-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-           <CharacterCardSkeleton    v-if="delayedLoading" v-for="i in 8" :key="'skeleton-'+i" />
-          <CharacterCard v-if="!delayedLoading" v-for="char in store.characters" :key="char.id" :character="char" @edit="openNotesModal" />
-        </div>
-      </UContainer>
-    </UMain>
 
+<UMain>
+  <UContainer class="py-6">
+    <TransitionGroup
+      name="fade"
+      tag="div"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+    >
+      <CharacterCardSkeleton
+        v-if="delayedLoading"
+        v-for="i in 8"
+        :key="'skeleton-' + i"
+      />
+      <CharacterCard
+        v-if="!delayedLoading"
+        v-for="char in store.characters"
+        :key="'char-' + char.id"
+        :character="char"
+        @edit="openNotesModal"
+      />
+    </TransitionGroup>
+  </UContainer>
+</UMain>
     <EditNotesModal :character="editingCharacter" v-model:open="showModal" @save="saveNotes" />
   </UApp>
 </template>
@@ -33,15 +46,13 @@ const editingCharacter = ref<Character | null>(null)
 const editingNotes = ref("")
 const showModal = ref(false)
 const delayedLoading = ref(true)
-// Открываем модалку с выбранным персонажем
+
 const openNotesModal = (char: Character) => {
   editingCharacter.value = char
   editingNotes.value = char.notes || ""
   showModal.value = true
 }
 
-
-// Сохраняем заметки через store
 const saveNotes = (notes: string) => {
   if (editingCharacter.value) {
     store.updateNotes(editingCharacter.value.id, notes)
@@ -62,3 +73,14 @@ watch(() => store.loading, (isLoading) => {
   }
 })
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity .3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}</style>
